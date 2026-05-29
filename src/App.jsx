@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const data = {
   gaps: [
@@ -125,11 +125,11 @@ const P = {
   orange: "#ea580c",
 };
 
-const navItems = ["Diagnóstico", "Casos de Uso", "Retorno Esperado", "Roadmap", "Referência"];
+const navItems = ["Diagnóstico", "Casos de Uso", "Retorno Esperado", "Roadmap", "Referência", "▶ Demo ao Vivo"];
 
 export default function App() {
   const [tab, setTab] = useState(0);
-  const tabs = [<GapsTab />, <CasosTab />, <ROITab />, <RoadmapTab />, <CaseTab />];
+  const tabs = [<GapsTab />, <CasosTab />, <ROITab />, <RoadmapTab />, <CaseTab />, <DemoTab />];
 
   return (
     <div style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", background: P.offWhite, minHeight: "100vh" }}>
@@ -415,6 +415,209 @@ function CaseTab() {
           </Card>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ─── DEMO ────────────────────────────────────────────────────────────────────
+const conversation = [
+  { id: 1, from: "system", text: "💜  Setai Grupo GP", sub: "Conta comercial verificada · BSP Oficial Meta", delay: 0 },
+  { id: 2, from: "bot", text: "Olá! 👋 Vi que você clicou no nosso anúncio do *Setai Residences* no Instagram. Seja bem-vindo!\n\nSou a assistente virtual do Setai Grupo GP. Posso te ajudar a conhecer melhor o empreendimento e agendar uma visita.\n\nQual é o seu nome?", delay: 600 },
+  { id: 3, from: "user", text: "Oi, sou a Ana Clara", delay: 1400 },
+  { id: 4, from: "bot", text: "Prazer, Ana Clara! 😊\n\nO *Setai Residences Design by Pininfarina* é um empreendimento único em João Pessoa — o único no Brasil assinado pela Pininfarina, a lendária design house italiana.\n\nVocê tem interesse em usar o imóvel para *morar* ou como *investimento*?", delay: 2400 },
+  { id: 5, from: "user", text: "Investimento principalmente", delay: 3400 },
+  { id: 6, from: "bot", text: "Ótima escolha! 📈 João Pessoa está entre as cidades com maior valorização imobiliária do Brasil.\n\nPara te apresentar as opções mais adequadas ao seu perfil de investidora, me diz: você busca unidades a partir de qual faixa de valor?", delay: 4400 },
+  { id: 7, from: "user", text: "A partir de R$ 1 milhão", delay: 5600 },
+  { id: 8, from: "bot", text: "Perfeito! Temos opções que se encaixam muito bem nesse perfil. 🏙️\n\nAs plantas disponíveis a partir dessa faixa são:\n\n• *Tipo A* — 162m² · 3 suítes · 2 vagas\n• *Tipo B* — 189m² · 4 suítes · 3 vagas\n• *Cobertura* — 320m² · posições exclusivas\n\nQual delas desperta mais interesse para conhecer?", delay: 6600 },
+  { id: 9, from: "user", text: "O Tipo B parece interessante", delay: 7800 },
+  { id: 10, from: "bot", text: "Excelente gosto! O Tipo B tem uma das melhores posições do empreendimento com vista panorâmica. 🌅\n\nPosso agendar uma visita ao nosso espaço de experiência para você ver a maquete, os materiais e conversar com um consultor especializado.\n\nQual período funciona melhor para você?\n\n⬜ Esta semana\n⬜ Semana que vem\n⬜ Prefiro marcar por ligação", delay: 8800 },
+  { id: 11, from: "user", text: "Esta semana", delay: 10000 },
+  { id: 12, from: "bot", text: "Perfeito! 📅 Tenho disponibilidade nos seguintes horários:\n\n• *Quarta* — 14h ou 17h\n• *Quinta* — 10h ou 16h\n• *Sexta* — 11h\n\nQual prefere?", delay: 11000 },
+  { id: 13, from: "user", text: "Quinta às 16h", delay: 12200 },
+  { id: 14, from: "bot", text: "✅ *Visita confirmada!*\n\n📅 Quinta-feira · 16h00\n📍 Espaço Setai — Altiplano, João Pessoa\n👤 Uma consultora especializada estará te esperando\n\nVou te enviar a confirmação e o endereço exato por aqui. Até quinta, Ana Clara! 🏙️", delay: 13200 },
+];
+
+function DemoTab() {
+  const [step, setStep] = useState(0);
+  const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const visibleMessages = conversation.slice(0, step + 1).filter(m => m.from !== "system");
+  const systemMsg = conversation[0];
+
+  function startDemo() {
+    setStep(0);
+    setRunning(true);
+    setDone(false);
+  }
+
+  useEffect(() => {
+    if (!running) return;
+    if (step >= conversation.length - 1) { setRunning(false); setDone(true); return; }
+    const next = conversation[step + 1];
+    const timer = setTimeout(() => setStep(s => s + 1), next.delay - (conversation[step]?.delay || 0));
+    return () => clearTimeout(timer);
+  }, [running, step]);
+
+  useEffect(() => {
+    if (running || step > 0) {
+      const el = document.getElementById("chat-bottom");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [step]);
+
+  return (
+    <div>
+      <SH icon="▶️" title="Demo ao Vivo" sub="Veja como a IA do Setai qualifica um lead vindo de um anúncio no Instagram" />
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
+
+        {/* Explicação lateral */}
+        <div>
+          <Card style={{ marginBottom: 14, borderLeft: `3px solid ${P.purple}` }}>
+            <div style={{ fontWeight: 700, fontSize: 13, color: P.dark, marginBottom: 8 }}>O que está acontecendo nessa conversa</div>
+            <div style={{ fontSize: 12, color: P.gray, lineHeight: 1.7 }}>
+              Ana Clara clicou num anúncio do Setai Residences no Instagram. O clique abriu o WhatsApp automaticamente com a IA já ativa — sem nenhuma intervenção humana.
+            </div>
+          </Card>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {[
+              { icon: "📍", title: "Click Tracker ativo", desc: "O clique de Ana Clara no anúncio foi registrado. O Setai sabe exatamente qual criativo gerou essa conversa." },
+              { icon: "🤖", title: "IA qualificando em tempo real", desc: "Sem humano envolvido. A IA identifica o perfil investidor, filtra pela faixa de valor e apresenta as plantas certas." },
+              { icon: "📅", title: "Visita agendada automaticamente", desc: "Da chegada no WhatsApp até a confirmação da visita — tudo dentro da mesma conversa, em menos de 2 minutos." },
+              { icon: "📊", title: "Lead registrado e rastreado", desc: "Após o agendamento, o lead de Ana Clara entra automaticamente no funil com origem, perfil e próxima ação registrados." },
+            ].map((item, i) => (
+              <Card key={i} style={{ padding: "12px 14px" }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <span style={{ fontSize: 20, flexShrink: 0 }}>{item.icon}</span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 12, color: P.dark, marginBottom: 3 }}>{item.title}</div>
+                    <div style={{ fontSize: 11, color: P.gray, lineHeight: 1.5 }}>{item.desc}</div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Celular */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {/* Phone frame */}
+          <div style={{
+            width: 300, borderRadius: 36,
+            background: "#1a1a1a",
+            boxShadow: "0 24px 60px rgba(0,0,0,0.35), inset 0 0 0 2px #333",
+            padding: "10px 6px 14px",
+            position: "relative",
+          }}>
+            {/* Notch */}
+            <div style={{ width: 90, height: 22, background: "#1a1a1a", borderRadius: 12, margin: "0 auto 6px", position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#333" }} />
+              <div style={{ width: 50, height: 8, borderRadius: 4, background: "#333" }} />
+            </div>
+
+            {/* WhatsApp UI */}
+            <div style={{ borderRadius: 24, overflow: "hidden", background: "#ECE5DD" }}>
+
+              {/* Header */}
+              <div style={{ background: "#075E54", padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 36, height: 36, borderRadius: "50%", background: P.purple, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>🏙️</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "white" }}>Setai Grupo GP</div>
+                  <div style={{ fontSize: 10, color: "#B2DFDB" }}>✓ Conta comercial verificada</div>
+                </div>
+                <div style={{ fontSize: 16 }}>⋮</div>
+              </div>
+
+              {/* Anúncio origin tag */}
+              {step >= 0 && (
+                <div style={{ background: "#DCF8C6", margin: "8px 10px 4px", borderRadius: 8, padding: "6px 10px", fontSize: 10, color: "#075E54", display: "flex", gap: 6, alignItems: "center" }}>
+                  <span>📍</span>
+                  <span><strong>Via anúncio:</strong> Setai Residences — Instagram · Click to WhatsApp rastreado</span>
+                </div>
+              )}
+
+              {/* Messages */}
+              <div style={{ padding: "4px 8px 8px", minHeight: 380, maxHeight: 380, overflowY: "auto", display: "flex", flexDirection: "column", gap: 4 }}>
+                {step === 0 && !running && (
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+                    <div style={{ textAlign: "center", color: "#888" }}>
+                      <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+                      <div style={{ fontSize: 11 }}>Clique em iniciar para ver a conversa</div>
+                    </div>
+                  </div>
+                )}
+                {visibleMessages.map((msg, i) => (
+                  <div key={msg.id} style={{
+                    display: "flex",
+                    justifyContent: msg.from === "user" ? "flex-end" : "flex-start",
+                    animation: "fadeIn 0.3s ease",
+                  }}>
+                    <div style={{
+                      maxWidth: "82%",
+                      background: msg.from === "user" ? "#DCF8C6" : "white",
+                      borderRadius: msg.from === "user" ? "12px 12px 2px 12px" : "12px 12px 12px 2px",
+                      padding: "7px 10px",
+                      fontSize: 11,
+                      color: "#1a1a1a",
+                      lineHeight: 1.5,
+                      boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
+                      whiteSpace: "pre-wrap",
+                    }}>
+                      {msg.text.replace(/\*(.*?)\*/g, '$1')}
+                      <div style={{ fontSize: 9, color: "#999", textAlign: "right", marginTop: 2 }}>
+                        {msg.from === "user" ? "✓✓" : ""} {["14:32","14:32","14:33","14:33","14:34","14:34","14:35","14:35","14:36","14:36","14:37","14:37","14:38","14:38"][i] || "14:38"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {running && step > 0 && step < conversation.length - 1 && (
+                  <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                    <div style={{ background: "white", borderRadius: "12px 12px 12px 2px", padding: "8px 12px", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
+                      <div style={{ display: "flex", gap: 3 }}>
+                        {[0,1,2].map(i => (
+                          <div key={i} style={{ width: 6, height: 6, borderRadius: "50%", background: "#999", animation: `bounce 1s ${i*0.2}s infinite` }} />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div id="chat-bottom" />
+              </div>
+
+              {/* Input bar */}
+              <div style={{ background: "#F0F0F0", padding: "8px 10px", display: "flex", gap: 8, alignItems: "center" }}>
+                <div style={{ flex: 1, background: "white", borderRadius: 20, padding: "6px 12px", fontSize: 11, color: "#999" }}>
+                  {done ? "Visita confirmada! ✅" : "Digite uma mensagem"}
+                </div>
+                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#075E54", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>🎤</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Controls */}
+          <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+            <button onClick={startDemo} disabled={running} style={{
+              background: running ? P.gray : `linear-gradient(135deg, ${P.purple}, ${P.blue})`,
+              color: "white", border: "none", borderRadius: 20,
+              padding: "10px 24px", cursor: running ? "not-allowed" : "pointer",
+              fontSize: 13, fontWeight: 700, transition: "all 0.2s",
+            }}>
+              {running ? "⏳ Simulando..." : done ? "↺ Repetir demo" : "▶ Iniciar demo"}
+            </button>
+          </div>
+          {done && (
+            <div style={{ marginTop: 12, background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, padding: "8px 14px", fontSize: 11, color: P.green, textAlign: "center", maxWidth: 280 }}>
+              ✓ Lead qualificado, visita agendada — tudo automaticamente, sem humano envolvido.
+            </div>
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+      `}</style>
     </div>
   );
 }
