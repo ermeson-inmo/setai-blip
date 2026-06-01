@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // ─── PALETA ──────────────────────────────────────────────────────────────────
 const P = {
@@ -144,6 +145,7 @@ export default function App() {
       <div style={{ maxWidth:1100, margin:"0 auto", padding:"20px 14px 40px" }}>
         {tabs[tab]}
       </div>
+      <Analytics />
     </div>
   );
 }
